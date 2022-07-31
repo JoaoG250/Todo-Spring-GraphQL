@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TodospringgraphqlApplication {
+public class TodoSpringGraphqlApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TodospringgraphqlApplication.class, args);
+		SpringApplication.run(TodoSpringGraphqlApplication.class, args);
 	}
 
 }
