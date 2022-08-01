@@ -39,10 +39,11 @@ public class TodoService implements ITodoService {
     }
 
     private Todo buildTodo(TodoDto todoDto) {
-        Todo todo = new Todo(todoDto.getId(),
-                todoDto.getTitle(),
-                todoDto.getDescription(),
-                todoDto.getDone());
+        Todo todo = new Todo();
+        todo.setId(todoDto.getId());
+        todo.setTitle(todoDto.getTitle());
+        todo.setDescription(todoDto.getDescription());
+        todo.setDone(todoDto.getDone());
         return todo;
     }
 }

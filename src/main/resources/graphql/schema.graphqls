@@ -1,5 +1,6 @@
 type Query {
   todo(id: ID!): Todo!
+  todos: [Todo!]!
 }
 
 type Todo {
@@ -7,4 +8,15 @@ type Todo {
   done: Boolean!
   id: ID!
   title: String!
+}
+
+type Mutation {
+  saveTodo(id: ID, data: TodoInput!): Todo!
+  deleteTodo(id: ID!): Boolean!
+}
+
+input TodoInput {
+  title: String!
+  description: String!
+  done: Boolean!
 }
