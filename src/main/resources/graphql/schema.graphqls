@@ -8,6 +8,8 @@ type Todo {
   done: Boolean!
   id: ID!
   title: String!
+  createdAt: String!
+  updatedAt: String!
 }
 
 type Mutation {
