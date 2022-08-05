@@ -14,9 +14,16 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "todo")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Todo {
 
     @Id
@@ -24,74 +31,21 @@ public class Todo {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     @Column(name = "id", updatable = false, nullable = false)
     private String id;
-    @Column(name = "title", nullable = false, columnDefinition = "TEXT")
-    private String title;
-    @Column(name = "description", nullable = false, columnDefinition = "TEXT")
-    private String description;
-    @Column(name = "done", nullable = false)
-    private boolean done;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
+
     @Column(name = "updated_at", nullable = false)
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public Todo() {
-    }
+    @Column(name = "title", nullable = false, columnDefinition = "TEXT")
+    private String title;
 
-    @Override
-    public String toString() {
-        return "Todo [id=" + id + ", title=" + title + ", description=" + description + ", done=" + done
-                + ", createdAt="
-                + createdAt + ", updatedAt=" + updatedAt + "]";
-    }
+    @Column(name = "description", nullable = false, columnDefinition = "TEXT")
+    private String description;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean getDone() {
-        return done;
-    }
-
-    public void setDone(boolean done) {
-        this.done = done;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    @Column(name = "done", nullable = false)
+    private boolean done;
 }
