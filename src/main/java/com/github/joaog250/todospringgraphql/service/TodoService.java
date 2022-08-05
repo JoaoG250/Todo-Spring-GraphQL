@@ -4,17 +4,19 @@ import java.util.List;
 
 import javax.persistence.EntityNotFoundException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.github.joaog250.todospringgraphql.dto.TodoDto;
 import com.github.joaog250.todospringgraphql.model.Todo;
 import com.github.joaog250.todospringgraphql.repository.TodoRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service("todoService")
+@RequiredArgsConstructor
 public class TodoService implements ITodoService {
-    @Autowired
-    private TodoRepository todoRepository;
+
+    private final TodoRepository todoRepository;
 
     @Override
     public List<Todo> getAllTodos() {
