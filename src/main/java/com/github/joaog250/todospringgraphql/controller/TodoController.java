@@ -2,8 +2,6 @@ package com.github.joaog250.todospringgraphql.controller;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.springframework.data.web.ProjectedPayload;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -14,11 +12,13 @@ import com.github.joaog250.todospringgraphql.dto.TodoDto;
 import com.github.joaog250.todospringgraphql.model.Todo;
 import com.github.joaog250.todospringgraphql.service.ITodoService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
+@RequiredArgsConstructor
 public class TodoController {
 
-    @Resource(name = "todoService")
-    private ITodoService todoService;
+    private final ITodoService todoService;
 
     @QueryMapping
     public Todo todo(@Argument String id) {
@@ -36,7 +36,7 @@ public class TodoController {
         todoDto.setId(id);
         todoDto.setTitle(data.getTitle());
         todoDto.setDescription(data.getDescription());
-        todoDto.setDone(data.getDone());
+        todoDto.setDone(data.isDone());
         return todoService.saveTodo(todoDto);
     }
 
@@ -53,5 +53,5 @@ interface TodoInput {
 
     String getDescription();
 
-    boolean getDone();
+    boolean isDone();
 }

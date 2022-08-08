@@ -1,6 +1,8 @@
 type Query {
   todo(id: ID!): Todo!
   todos: [Todo!]!
+  user(id: ID!): User!
+  users: [User!]!
 }
 
 type Todo {
@@ -12,13 +14,29 @@ type Todo {
   updatedAt: String!
 }
 
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
 type Mutation {
   saveTodo(id: ID, data: TodoInput!): Todo!
   deleteTodo(id: ID!): Boolean!
+  saveUser(id: ID, data: UserInput!): User!
+  deleteUser(id: ID!): Boolean!
 }
 
 input TodoInput {
   title: String!
   description: String!
   done: Boolean!
+}
+
+input UserInput {
+  name: String!
+  email: String!
+  password: String!
 }

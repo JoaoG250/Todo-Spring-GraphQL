@@ -31,21 +31,17 @@ public class TodoService implements ITodoService {
 
     @Override
     public Todo saveTodo(TodoDto todo) {
-        Todo newTodo = buildTodo(todo);
+        Todo newTodo = Todo.builder()
+                .id(todo.getId())
+                .title(todo.getTitle())
+                .description(todo.getDescription())
+                .done(todo.isDone())
+                .build();
         return todoRepository.save(newTodo);
     }
 
     @Override
     public void deleteTodo(String id) {
         todoRepository.deleteById(id);
-    }
-
-    private Todo buildTodo(TodoDto todoDto) {
-        Todo todo = new Todo();
-        todo.setId(todoDto.getId());
-        todo.setTitle(todoDto.getTitle());
-        todo.setDescription(todoDto.getDescription());
-        todo.setDone(todoDto.getDone());
-        return todo;
     }
 }
