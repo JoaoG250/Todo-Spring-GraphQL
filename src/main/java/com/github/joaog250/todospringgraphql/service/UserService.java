@@ -6,6 +6,7 @@ import javax.persistence.EntityNotFoundException;
 
 import org.springframework.stereotype.Service;
 
+import com.github.joaog250.todospringgraphql.dto.RoleDto;
 import com.github.joaog250.todospringgraphql.dto.UserDto;
 import com.github.joaog250.todospringgraphql.model.Role;
 import com.github.joaog250.todospringgraphql.model.User;
@@ -55,8 +56,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Role saveRole(Role role) {
-        return roleRepository.save(role);
+    public Role saveRole(RoleDto role) {
+        Role newRole = Role.builder()
+                .id(role.getId())
+                .name(role.getName())
+                .build();
+        return roleRepository.save(newRole);
     }
 
     @Override

@@ -8,7 +8,9 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
+import com.github.joaog250.todospringgraphql.dto.RoleDto;
 import com.github.joaog250.todospringgraphql.dto.UserDto;
+import com.github.joaog250.todospringgraphql.model.Role;
 import com.github.joaog250.todospringgraphql.model.User;
 import com.github.joaog250.todospringgraphql.service.IUserService;
 
@@ -45,6 +47,20 @@ public class UserController {
         userService.deleteUser(id);
         return true;
     }
+
+    @MutationMapping
+    public Role saveRole(@Argument String id, @Argument RoleInput data) {
+        RoleDto roleDto = new RoleDto();
+        roleDto.setId(id);
+        roleDto.setName(data.getName());
+        return userService.saveRole(roleDto);
+    }
+
+    @MutationMapping
+    public boolean addRoleToUser(@Argument String email, @Argument String roleName) {
+        userService.addRoleToUser(email, roleName);
+        return true;
+    }
 }
 
 @ProjectedPayload
@@ -54,4 +70,9 @@ interface UserInput {
     String getEmail();
 
     String getPassword();
+}
+
+@ProjectedPayload
+interface RoleInput {
+    String getName();
 }

@@ -22,11 +22,20 @@ type User {
   updatedAt: String!
 }
 
+type Role {
+  id: ID!
+  name: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
 type Mutation {
   saveTodo(id: ID, data: TodoInput!): Todo!
   deleteTodo(id: ID!): Boolean!
   saveUser(id: ID, data: UserInput!): User!
   deleteUser(id: ID!): Boolean!
+  saveRole(id: ID, data: RoleInput!): Role!
+  addRoleToUser(email: String!, roleName: String!): Boolean!
 }
 
 input TodoInput {
@@ -39,4 +48,8 @@ input UserInput {
   name: String!
   email: String!
   password: String!
+}
+
+input RoleInput {
+  name: String!
 }

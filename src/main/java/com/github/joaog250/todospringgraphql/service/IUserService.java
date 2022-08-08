@@ -2,6 +2,7 @@ package com.github.joaog250.todospringgraphql.service;
 
 import java.util.List;
 
+import com.github.joaog250.todospringgraphql.dto.RoleDto;
 import com.github.joaog250.todospringgraphql.dto.UserDto;
 import com.github.joaog250.todospringgraphql.model.Role;
 import com.github.joaog250.todospringgraphql.model.User;
@@ -17,7 +18,7 @@ public interface IUserService {
 
     void deleteUser(String id);
 
-    Role saveRole(Role role);
+    Role saveRole(RoleDto role);
 
     void addRoleToUser(String email, String roleName);
 
