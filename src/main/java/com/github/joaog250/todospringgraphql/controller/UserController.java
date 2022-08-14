@@ -6,6 +6,7 @@ import org.springframework.data.web.ProjectedPayload;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +32,7 @@ public class UserController {
     private final AuthenticationProvider authenticationProvider;
 
     @MutationMapping
+    @PreAuthorize("isAnonymous()")
     public String login(@Argument String email, @Argument String password) {
         UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(email, password);
         try {
@@ -44,16 +46,19 @@ public class UserController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public User user(@Argument String id) {
         return userService.getUserById(id);
     }
 
     @QueryMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<User> users() {
         return userService.getAllUsers();
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public User saveUser(@Argument String id, @Argument UserInput data) {
         UserDto userDto = new UserDto();
         userDto.setId(id);
@@ -64,12 +69,14 @@ public class UserController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public boolean deleteUser(@Argument String id) {
         userService.deleteUser(id);
         return true;
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Role saveRole(@Argument String id, @Argument RoleInput data) {
         RoleDto roleDto = new RoleDto();
         roleDto.setId(id);
@@ -78,6 +85,7 @@ public class UserController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public boolean addRoleToUser(@Argument String email, @Argument String roleName) {
         userService.addRoleToUser(email, roleName);
         return true;
