@@ -6,6 +6,11 @@ import org.springframework.data.web.ProjectedPayload;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import com.github.joaog250.todospringgraphql.dto.RoleDto;
@@ -21,6 +26,20 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final IUserService userService;
+    private final AuthenticationProvider authenticationProvider;
+
+    @MutationMapping
+    public String login(@Argument String email, @Argument String password) {
+        UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(email, password);
+        try {
+            SecurityContextHolder.getContext()
+                    .setAuthentication(authenticationProvider.authenticate(credentials));
+            User user = userService.getCurrentUser();
+            return userService.getToken(user);
+        } catch (AuthenticationException e) {
+            throw new BadCredentialsException("Invalid credentials");
+        }
+    }
 
     @QueryMapping
     public User user(@Argument String id) {

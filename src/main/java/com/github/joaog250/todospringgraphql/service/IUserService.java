@@ -2,12 +2,15 @@ package com.github.joaog250.todospringgraphql.service;
 
 import java.util.List;
 
+import org.springframework.security.core.userdetails.UserDetailsService;
+
 import com.github.joaog250.todospringgraphql.dto.RoleDto;
 import com.github.joaog250.todospringgraphql.dto.UserDto;
 import com.github.joaog250.todospringgraphql.model.Role;
 import com.github.joaog250.todospringgraphql.model.User;
+import com.github.joaog250.todospringgraphql.security.JWTUserDetails;
 
-public interface IUserService {
+public interface IUserService extends UserDetailsService {
     List<User> getAllUsers();
 
     User getUserById(String id);
@@ -22,4 +25,9 @@ public interface IUserService {
 
     void addRoleToUser(String email, String roleName);
 
+    User getCurrentUser();
+
+    String getToken(User user);
+
+    JWTUserDetails loadUserByToken(String token);
 }
