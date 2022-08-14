@@ -8,7 +8,6 @@ import com.github.joaog250.todospringgraphql.dto.RoleDto;
 import com.github.joaog250.todospringgraphql.dto.UserDto;
 import com.github.joaog250.todospringgraphql.model.Role;
 import com.github.joaog250.todospringgraphql.model.User;
-import com.github.joaog250.todospringgraphql.security.JWTUserDetails;
 
 public interface IUserService extends UserDetailsService {
     List<User> getAllUsers();
@@ -24,10 +23,4 @@ public interface IUserService extends UserDetailsService {
     Role saveRole(RoleDto role);
 
     void addRoleToUser(String email, String roleName);
-
-    User getCurrentUser();
-
-    String getToken(User user);
-
-    JWTUserDetails loadUserByToken(String token);
 }

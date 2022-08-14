@@ -17,6 +17,7 @@ import com.github.joaog250.todospringgraphql.dto.RoleDto;
 import com.github.joaog250.todospringgraphql.dto.UserDto;
 import com.github.joaog250.todospringgraphql.model.Role;
 import com.github.joaog250.todospringgraphql.model.User;
+import com.github.joaog250.todospringgraphql.service.IAuthService;
 import com.github.joaog250.todospringgraphql.service.IUserService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final IUserService userService;
+    private final IAuthService authService;
     private final AuthenticationProvider authenticationProvider;
 
     @MutationMapping
@@ -34,8 +36,8 @@ public class UserController {
         try {
             SecurityContextHolder.getContext()
                     .setAuthentication(authenticationProvider.authenticate(credentials));
-            User user = userService.getCurrentUser();
-            return userService.getToken(user);
+            User user = authService.getCurrentUser();
+            return authService.getToken(user);
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid credentials");
         }
