@@ -18,6 +18,7 @@ type User {
   id: ID!
   email: String!
   name: String!
+  roles: [Role!]!
   createdAt: String!
   updatedAt: String!
 }
