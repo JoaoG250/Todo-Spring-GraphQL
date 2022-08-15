@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.github.joaog250.todospringgraphql.service.IAuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,15 +32,19 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain filterChain)
             throws ServletException, IOException {
-        getToken(request)
-                .map(authService::loadUserByToken)
-                .map(userDetails -> JWTPreAuthenticationToken
+        getToken(request).ifPresent(token -> {
+            try {
+                JWTUserDetails userDetails = authService.loadUserByToken(token);
+                JWTPreAuthenticationToken authentication = JWTPreAuthenticationToken
                         .builder()
                         .principal(userDetails)
                         .details(new WebAuthenticationDetailsSource().buildDetails(request))
-                        .build())
-                .ifPresent(authentication -> SecurityContextHolder.getContext()
-                        .setAuthentication(authentication));
+                        .build();
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (JWTVerificationException e) {
+                SecurityContextHolder.getContext().setAuthentication(null);
+            }
+        });
         filterChain.doFilter(request, response);
     }
 

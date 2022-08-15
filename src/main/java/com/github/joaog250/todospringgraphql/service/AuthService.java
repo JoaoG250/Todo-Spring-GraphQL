@@ -56,7 +56,7 @@ public class AuthService implements IAuthService {
     }
 
     @Override
-    public JWTUserDetails loadUserByToken(String token) {
+    public JWTUserDetails loadUserByToken(String token) throws JWTVerificationException {
         return getDecodedToken(token)
                 .map(DecodedJWT::getSubject)
                 .flatMap(userRepository::findByEmail)
