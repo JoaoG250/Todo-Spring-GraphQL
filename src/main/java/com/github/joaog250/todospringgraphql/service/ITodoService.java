@@ -9,7 +9,7 @@ import com.github.joaog250.todospringgraphql.dto.TodoDto;
 import com.github.joaog250.todospringgraphql.model.Todo;
 
 public interface ITodoService {
-    Todo saveTodo(TodoDto todo);
+    Todo saveTodo(TodoDto todo) throws EntityNotFoundException;
 
     Optional<Todo> getTodoById(String id);
 

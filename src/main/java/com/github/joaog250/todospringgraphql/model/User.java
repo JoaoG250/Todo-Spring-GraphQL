@@ -2,7 +2,7 @@ package com.github.joaog250.todospringgraphql.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +11,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -23,6 +24,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -59,5 +61,9 @@ public class User {
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private final Collection<Role> roles = new ArrayList<>();
+    private final List<Role> roles = new ArrayList<>();
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private final List<Todo> todos = new ArrayList<>();
 }

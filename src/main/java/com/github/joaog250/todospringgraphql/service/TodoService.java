@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class TodoService implements ITodoService {
 
     private final TodoRepository todoRepository;
+    private final IAuthService authService;
 
     @Override
     public List<Todo> getAllTodos() {
@@ -30,13 +31,14 @@ public class TodoService implements ITodoService {
     }
 
     @Override
-    public Todo saveTodo(TodoDto todo) {
-        Todo newTodo = Todo.builder()
+    public Todo saveTodo(TodoDto todo) throws EntityNotFoundException {
+        Todo newTodo = authService.getCurrentUser().map(user -> Todo.builder()
                 .id(todo.getId())
                 .title(todo.getTitle())
                 .description(todo.getDescription())
                 .done(todo.isDone())
-                .build();
+                .user(user)
+                .build()).orElseThrow(() -> new EntityNotFoundException("User not found"));
         return todoRepository.save(newTodo);
     }
 

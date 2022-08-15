@@ -44,7 +44,11 @@ public class TodoController {
         todoDto.setTitle(data.getTitle());
         todoDto.setDescription(data.getDescription());
         todoDto.setDone(data.isDone());
-        return todoService.saveTodo(todoDto);
+        try {
+            return todoService.saveTodo(todoDto);
+        } catch (EntityNotFoundException e) {
+            throw new GraphQLException(e.getMessage());
+        }
     }
 
     @MutationMapping
