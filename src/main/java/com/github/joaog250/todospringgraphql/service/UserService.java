@@ -3,6 +3,7 @@ package com.github.joaog250.todospringgraphql.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -45,15 +46,13 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User getUserById(String id) {
-        return userRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("User not found"));
+    public Optional<User> getUserById(String id) {
+        return userRepository.findById(id);
     }
 
     @Override
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(
-                () -> new EntityNotFoundException("User not found"));
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override
@@ -68,8 +67,10 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void deleteUser(String id) {
-        userRepository.deleteById(id);
+    public void deleteUser(String id) throws EntityNotFoundException {
+        getUserById(id).ifPresentOrElse(user -> userRepository.delete(user), () -> {
+            throw new EntityNotFoundException("User not found");
+        });
     }
 
     @Override
@@ -82,7 +83,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void addRoleToUser(String email, String roleName) {
+    public void addRoleToUser(String email, String roleName) throws EntityNotFoundException {
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException("User not found"));
         Role role = roleRepository.findByName(roleName).orElseThrow(

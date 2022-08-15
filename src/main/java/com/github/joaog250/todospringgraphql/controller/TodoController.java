@@ -2,6 +2,8 @@ package com.github.joaog250.todospringgraphql.controller;
 
 import java.util.List;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.data.web.ProjectedPayload;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -13,6 +15,7 @@ import com.github.joaog250.todospringgraphql.dto.TodoDto;
 import com.github.joaog250.todospringgraphql.model.Todo;
 import com.github.joaog250.todospringgraphql.service.ITodoService;
 
+import graphql.GraphQLException;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -24,7 +27,7 @@ public class TodoController {
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
     public Todo todo(@Argument String id) {
-        return todoService.getTodoById(id);
+        return todoService.getTodoById(id).orElse(null);
     }
 
     @QueryMapping
@@ -47,8 +50,12 @@ public class TodoController {
     @MutationMapping
     @PreAuthorize("isAuthenticated()")
     public boolean deleteTodo(@Argument String id) {
-        todoService.deleteTodo(id);
-        return true;
+        try {
+            todoService.deleteTodo(id);
+            return true;
+        } catch (EntityNotFoundException e) {
+            throw new GraphQLException(e.getMessage());
+        }
     }
 }
 

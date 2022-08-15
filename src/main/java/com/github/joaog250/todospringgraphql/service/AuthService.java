@@ -46,13 +46,12 @@ public class AuthService implements IAuthService {
     }
 
     @Override
-    public User getCurrentUser() {
+    public Optional<User> getCurrentUser() {
         return Optional
                 .ofNullable(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
                 .map(Authentication::getName)
-                .flatMap(userRepository::findByEmail)
-                .orElse(null);
+                .flatMap(userRepository::findByEmail);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.github.joaog250.todospringgraphql.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -24,9 +25,8 @@ public class TodoService implements ITodoService {
     }
 
     @Override
-    public Todo getTodoById(String id) {
-        return todoRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Todo not found"));
+    public Optional<Todo> getTodoById(String id) {
+        return todoRepository.findById(id);
     }
 
     @Override
@@ -41,7 +41,9 @@ public class TodoService implements ITodoService {
     }
 
     @Override
-    public void deleteTodo(String id) {
-        todoRepository.deleteById(id);
+    public void deleteTodo(String id) throws EntityNotFoundException {
+        getTodoById(id).ifPresentOrElse(todo -> todoRepository.delete(todo), () -> {
+            throw new EntityNotFoundException("Todo not found");
+        });
     }
 }

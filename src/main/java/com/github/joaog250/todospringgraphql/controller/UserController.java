@@ -1,6 +1,9 @@
 package com.github.joaog250.todospringgraphql.controller;
 
 import java.util.List;
+import java.util.Optional;
+
+import javax.persistence.EntityNotFoundException;
 
 import org.springframework.data.web.ProjectedPayload;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -21,6 +24,7 @@ import com.github.joaog250.todospringgraphql.model.User;
 import com.github.joaog250.todospringgraphql.service.IAuthService;
 import com.github.joaog250.todospringgraphql.service.IUserService;
 
+import graphql.GraphQLException;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -38,8 +42,12 @@ public class UserController {
         try {
             SecurityContextHolder.getContext()
                     .setAuthentication(authenticationProvider.authenticate(credentials));
-            User user = authService.getCurrentUser();
-            return authService.getToken(user);
+            Optional<User> user = authService.getCurrentUser();
+            if (user.isPresent()) {
+                return authService.getToken(user.get());
+            } else {
+                throw new BadCredentialsException("Invalid credentials");
+            }
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid credentials");
         }
@@ -48,7 +56,7 @@ public class UserController {
     @QueryMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public User user(@Argument String id) {
-        return userService.getUserById(id);
+        return userService.getUserById(id).orElse(null);
     }
 
     @QueryMapping
@@ -71,8 +79,12 @@ public class UserController {
     @MutationMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public boolean deleteUser(@Argument String id) {
-        userService.deleteUser(id);
-        return true;
+        try {
+            userService.deleteUser(id);
+            return true;
+        } catch (EntityNotFoundException e) {
+            throw new GraphQLException(e.getMessage());
+        }
     }
 
     @MutationMapping
@@ -87,8 +99,12 @@ public class UserController {
     @MutationMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public boolean addRoleToUser(@Argument String email, @Argument String roleName) {
-        userService.addRoleToUser(email, roleName);
-        return true;
+        try {
+            userService.addRoleToUser(email, roleName);
+            return true;
+        } catch (EntityNotFoundException e) {
+            throw new GraphQLException(e.getMessage());
+        }
     }
 }
 
