@@ -30,6 +30,11 @@ type Role {
   updatedAt: String!
 }
 
+type AuthTokens {
+  accessToken: String!
+  refreshToken: String!
+}
+
 type Mutation {
   saveTodo(id: ID, data: TodoInput!): Todo!
   deleteTodo(id: ID!): Boolean!
@@ -37,7 +42,8 @@ type Mutation {
   deleteUser(id: ID!): Boolean!
   saveRole(id: ID, data: RoleInput!): Role!
   addRoleToUser(email: String!, roleName: String!): Boolean!
-  login(email: String!, password: String!): String!
+  login(email: String!, password: String!): AuthTokens!
+  refreshToken(refreshToken: String!): String!
 }
 
 input TodoInput {

@@ -17,6 +17,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.github.joaog250.todospringgraphql.dto.AuthTokensDto;
 import com.github.joaog250.todospringgraphql.dto.RoleDto;
 import com.github.joaog250.todospringgraphql.dto.UserDto;
 import com.github.joaog250.todospringgraphql.model.Role;
@@ -37,19 +39,32 @@ public class UserController {
 
     @MutationMapping
     @PreAuthorize("isAnonymous()")
-    public String login(@Argument String email, @Argument String password) {
+    public AuthTokensDto login(@Argument String email, @Argument String password) {
         UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(email, password);
         try {
             SecurityContextHolder.getContext()
                     .setAuthentication(authenticationProvider.authenticate(credentials));
             Optional<User> user = authService.getCurrentUser();
             if (user.isPresent()) {
-                return authService.getToken(user.get());
+                AuthTokensDto tokens = new AuthTokensDto();
+                tokens.setAccessToken(authService.signAccessToken(user.get()));
+                tokens.setRefreshToken(authService.signRefreshToken(user.get()));
+                return tokens;
             } else {
                 throw new BadCredentialsException("Invalid credentials");
             }
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid credentials");
+        }
+    }
+
+    @MutationMapping
+    @PreAuthorize("isAnonymous()")
+    public String refreshToken(@Argument String refreshToken) {
+        try {
+            return authService.refreshToken(refreshToken);
+        } catch (JWTVerificationException e) {
+            throw new GraphQLException("Invalid refresh token");
         }
     }
 

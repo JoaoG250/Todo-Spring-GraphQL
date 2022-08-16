@@ -7,7 +7,11 @@ import com.github.joaog250.todospringgraphql.model.User;
 import com.github.joaog250.todospringgraphql.security.JWTUserDetails;
 
 public interface IAuthService {
-    String getToken(User user);
+    String signAccessToken(User user);
+
+    String signRefreshToken(User user);
+
+    String refreshToken(String token) throws JWTVerificationException;
 
     Optional<User> getCurrentUser();
 

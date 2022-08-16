@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -22,27 +23,63 @@ import com.github.joaog250.todospringgraphql.model.User;
 import com.github.joaog250.todospringgraphql.repository.UserRepository;
 import com.github.joaog250.todospringgraphql.security.JWTUserDetails;
 
-import lombok.AllArgsConstructor;
-
 @Service("jwtService")
-@AllArgsConstructor
 public class AuthService implements IAuthService {
 
     private final UserRepository userRepository;
-    private final JWTVerifier verifier;
-    private final Algorithm algorithm;
+    private final JWTVerifier accessTokenVerifier;
+    private final JWTVerifier refreshTokenVerifier;
+    private final Algorithm accessTokenAlgorithm;
+    private final Algorithm refreshTokenAlgorithm;
+    private final static String issuer = "todo-spring-graphql";
 
-    @Override
-    public String getToken(User user) {
+    @Autowired
+    public AuthService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+        this.accessTokenAlgorithm = Algorithm.HMAC256("accessTokenSecret");
+        this.refreshTokenAlgorithm = Algorithm.HMAC256("refreshTokenSecret");
+        this.accessTokenVerifier = JWT.require(accessTokenAlgorithm).withIssuer(issuer).build();
+        this.refreshTokenVerifier = JWT.require(refreshTokenAlgorithm).withIssuer(issuer).build();
+    }
+
+    private String signToken(String subject, Instant expiry, Algorithm algorithm) {
         Instant now = Instant.now();
-        Instant expiry = Instant.now().plus(Duration.ofHours(2)); // Token will be valid for 2 hours
         return JWT
                 .create()
-                .withIssuer("todo-spring-graphql") // Same as within the JWTVerifier
+                .withIssuer(issuer)
                 .withIssuedAt(Date.from(now))
                 .withExpiresAt(Date.from(expiry))
-                .withSubject(user.getEmail())
-                .sign(algorithm); // Same algorithm as within the JWTVerifier
+                .withSubject(subject)
+                .sign(algorithm);
+    }
+
+    private Optional<DecodedJWT> verifyToken(String token, JWTVerifier verifier) {
+        try {
+            return Optional.of(verifier.verify(token));
+        } catch (JWTVerificationException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public String signAccessToken(User user) {
+        Instant expiry = Instant.now().plus(Duration.ofHours(2)); // Token will be valid for 2 hours
+        return signToken(user.getEmail(), expiry, accessTokenAlgorithm);
+    }
+
+    @Override
+    public String signRefreshToken(User user) {
+        Instant expiry = Instant.now().plus(Duration.ofDays(1)); // Token will be valid for 2 hours
+        return signToken(user.getEmail(), expiry, refreshTokenAlgorithm);
+    }
+
+    @Override
+    public String refreshToken(String refreshToken) throws JWTVerificationException {
+        return verifyToken(refreshToken, refreshTokenVerifier)
+                .map(DecodedJWT::getSubject)
+                .flatMap(userRepository::findByEmail)
+                .map(user -> signAccessToken(user))
+                .orElseThrow(() -> new JWTVerificationException("Invalid token"));
     }
 
     @Override
@@ -56,19 +93,11 @@ public class AuthService implements IAuthService {
 
     @Override
     public JWTUserDetails loadUserByToken(String token) throws JWTVerificationException {
-        return getDecodedToken(token)
+        return verifyToken(token, accessTokenVerifier)
                 .map(DecodedJWT::getSubject)
                 .flatMap(userRepository::findByEmail)
                 .map(user -> getUserDetails(user, token))
                 .orElseThrow(() -> new JWTVerificationException("Invalid token"));
-    }
-
-    private Optional<DecodedJWT> getDecodedToken(String token) {
-        try {
-            return Optional.of(verifier.verify(token));
-        } catch (JWTVerificationException e) {
-            return Optional.empty();
-        }
     }
 
     private JWTUserDetails getUserDetails(User user, String token) {

@@ -9,9 +9,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.github.joaog250.todospringgraphql.service.UserService;
 
 @SpringBootApplication
@@ -20,16 +17,6 @@ public class TodoSpringGraphqlApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(TodoSpringGraphqlApplication.class, args);
-	}
-
-	@Bean
-	public Algorithm jwtAlgorithm() {
-		return Algorithm.HMAC256("secret");
-	}
-
-	@Bean
-	public JWTVerifier jwtVerifier(Algorithm algorithm) {
-		return JWT.require(algorithm).withIssuer("todo-spring-graphql").build();
 	}
 
 	@Bean
